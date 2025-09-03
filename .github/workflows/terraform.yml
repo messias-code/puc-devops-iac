@@ -1,0 +1,45 @@
+# Nome do nosso fluxo de trabalho, que aparecerá na aba "Actions" do GitHub
+name: 'Terraform CI'
+
+# Define o gatilho: este workflow vai rodar toda vez que houver um push na branch 'main'
+on:
+  push:
+    branches:
+    - main
+
+# Define as variáveis de ambiente que o Terraform vai usar para se autenticar.
+# Os valores vêm dos segredos que configuramos no GitHub.
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+# Define os "trabalhos" (jobs) que serão executados. Teremos apenas um chamado 'terraform'.
+jobs:
+  terraform:
+    # Nome do job que aparecerá na interface do GitHub Actions
+    name: 'Terraform Plan'
+    
+    # Define o tipo de máquina virtual que o GitHub vai usar para rodar nosso job
+    runs-on: ubuntu-latest
+
+    # Define os passos (steps) que o job vai executar em sequência
+    steps:
+    # 1. Baixa o código do nosso repositório para a máquina virtual do GitHub
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # 2. Instala o Terraform na máquina virtual
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0 # Você pode ajustar a versão se necessário
+
+    # 3. Executa 'terraform init' para inicializar o provedor do Azure
+    - name: Terraform Init
+      run: terraform init
+
+    # 4. Executa 'terraform plan' para validar a sintaxe e o plano de execução
+    - name: Terraform Plan
+      run: terraform plan
