@@ -22,8 +22,8 @@ Siga os passos abaixo para provisionar a infraestrutura e executar a aplicação
 
 1.  **Clone o Repositório**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git](https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git)
-    cd SEU-REPOSITORIO
+    git clone [https://github.com/messias-code/puc-devops-iac.git](https://github.com/messias-code/puc-devops-iac.git)
+    cd puc-devops-iac
     ```
 
 2.  **Provisione a Infraestrutura com Terraform**
