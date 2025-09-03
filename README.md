@@ -1,152 +1,109 @@
-# Projeto de API Simples com IaC no Azure
+# Projeto DevOps: API em Python com Infraestrutura como Código no Azure
 
-Este projeto demonstra a criação e implantação de uma API web simples desenvolvida em Python com Flask. Toda a infraestrutura necessária na nuvem Azure é provisionada de forma automatizada usando Terraform.
+## 1. Objetivo do Projeto
 
-O objetivo é servir como um guia prático para um fluxo de trabalho básico de DevOps, cobrindo desde a Infraestrutura como Código (IaC) até a execução da aplicação em uma máquina virtual.
+Este projeto demonstra um ciclo de vida de desenvolvimento e operações (DevOps) de ponta a ponta. O objetivo principal é provisionar automaticamente a infraestrutura na nuvem Microsoft Azure usando **Terraform** (Infraestrutura como Código), implantar uma API web simples desenvolvida em **Python (Flask)** e validar continuamente o código de infraestrutura através de um pipeline de CI/CD com **GitHub Actions**.
 
----
-
-## 🚀 Tecnologias Utilizadas
-
-*   **Nuvem:** Microsoft Azure
-*   **Infraestrutura como Código (IaC):** Terraform
-*   **Linguagem da Aplicação:** Python 3
-*   **Framework Web:** Flask
+O resultado é uma aplicação funcional rodando na nuvem, cujo ambiente pode ser criado e destruído de forma rápida, confiável e repetível.
 
 ---
 
-## 📂 Estrutura do Projeto
+## 2. Como Rodar o Projeto
 
-*   `main.tf`: Arquivo principal do Terraform que define toda a infraestrutura a ser criada no Azure (rede, máquina virtual, regras de segurança, etc.).
-*   `app.py`: O código da aplicação web em Python/Flask que será executada na máquina virtual.
-*   `README.md`: Este documento.
+Siga os passos abaixo para provisionar a infraestrutura e executar a aplicação.
 
----
+### Pré-requisitos
 
-## 📋 Pré-requisitos
+* Uma conta ativa na [Microsoft Azure](https://azure.microsoft.com/).
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) instalado localmente.
+* [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) instalado e autenticado (`az login`).
 
-Antes de começar, garanta que você tenha as seguintes ferramentas instaladas e configuradas no seu ambiente local:
+### Passos para Execução
 
-1.  [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
-2.  [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
-3.  Uma conta ativa no Azure com permissões para criar recursos.
+1.  **Clone o Repositório**
+    ```bash
+    git clone [https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git](https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git)
+    cd SEU-REPOSITORIO
+    ```
 
----
+2.  **Provisione a Infraestrutura com Terraform**
+    Execute os seguintes comandos no seu terminal local:
+    ```bash
+    # Inicializa os plugins do Terraform
+    terraform init
 
-## ⚙️ Guia de Execução
+    # (Opcional) Revisa o plano de execução
+    terraform plan
 
-Siga os passos abaixo para provisionar a infraestrutura e implantar a aplicação.
+    # Cria os recursos na Azure (confirme com 'yes')
+    terraform apply
+    ```
+    > Ao final, o Terraform exibirá o endereço de IP público da VM (`ip_publico_da_vm`). Guarde este valor.
 
-### 1. Provisionar a Infraestrutura com Terraform
+3.  **Acesse a Máquina Virtual**
+    Use o IP público para se conectar à VM via SSH.
+    ```bash
+    ssh aluno@<SEU_IP_PUBLICO>
+    ```
+    > A senha é a que está definida no arquivo `main.tf`.
 
-Estes comandos devem ser executados no seu terminal, na raiz deste projeto.
+4.  **Execute a API dentro da VM**
+    Uma vez conectado na VM, execute os seguintes comandos:
+    ```bash
+    # (Apenas na primeira vez) Instala o Flask
+    sudo pip3 install Flask
 
-**a. Faça login na sua conta do Azure:**
-```bash
-az login
-```
+    # Inicia o servidor da API
+    # (Use o repositório clonado dentro da VM ou crie o arquivo app.py)
+    sudo python3 app.py
+    ```
 
-**b. Inicialize o Terraform:**
-Este comando prepara seu diretório de trabalho para o Terraform.
-```bash
-terraform init
-```
+5.  **Teste a API**
+    Abra seu navegador e acesse os seguintes endpoints:
+    * `http://<SEU_IP_PUBLICO>/` - Deve retornar a mensagem de "Olá, Mundo!".
+    * `http://<SEU_IP_PUBLICO>/status` - Deve retornar o JSON `{"status": "ok"}`.
 
-**c. Planeje e revise as mudanças:**
-O Terraform mostrará o que será criado, alterado ou destruído.
-```bash
-terraform plan
-```
-
-**d. Aplique a configuração para criar os recursos no Azure:**
-Confirme a execução digitando `yes` quando solicitado.
-```bash
-terraform apply
-```
-> 🔑 **Guarde o IP!** Ao final, o Terraform exibirá o IP público da máquina virtual em `ip_publico_da_vm`. Você precisará dele para os próximos passos.
-
-### 2. Executar a API na Máquina Virtual
-
-**a. Conecte-se à VM recém-criada via SSH:**
-Substitua `<IP_PUBLICO_DA_VM>` pelo endereço de IP obtido no passo anterior. A senha é a que está definida no arquivo `main.tf` (padrão: `SenhaSuperForte123!`).
-
-```bash
-ssh aluno@<IP_PUBLICO_DA_VM>
-```
-
-**b. Dentro da VM, prepare o ambiente (só precisa ser feito uma vez):**
-```bash
-# Atualiza a lista de pacotes
-sudo apt update
-
-# Instala o gerenciador de pacotes do Python (pip)
-sudo apt install python3-pip -y
-
-# Instala o Flask
-sudo pip3 install Flask
-```
-
-**c. Crie o arquivo da aplicação:**
-Ainda dentro da VM, crie o arquivo `app.py` com o seguinte conteúdo:
-```bash
-nano app.py
-```
-Cole o código abaixo, salve e feche o editor (Ctrl+X, depois Y, e Enter).
-
-```python
-# Importa a classe Flask e a função jsonify da biblioteca flask
-from flask import Flask, jsonify
-
-# Cria uma instância da aplicação web.
-app = Flask(__name__)
-
-# Rota principal que já tínhamos
-@app.route('/')
-def hello_world():
-    return '<h1>Olá, Mundo! Minha API está no ar!</h1>'
-
-
-# --- INÍCIO DA NOVA ROTA ---
-
-# Define a nova rota "/status"
-@app.route('/status')
-def get_status():
-    # Cria um dicionário Python que representa nossa resposta
-    response = {
-        "status": "ok"
-    }
-    # Usa a função jsonify para converter o dicionário em uma resposta JSON
-    # e envia o código de status HTTP 200 (OK)
-    return jsonify(response), 200
-
-# --- FIM DA NOVA ROTA ---
-
-
-# Esta linha verifica se o script está sendo executado diretamente
-if __name__ == '__main__':
-    # Inicia o servidor da aplicação
-    app.run(host='0.0.0.0', port=80)
-```
-
-**d. Inicie o servidor da API:**
-```bash
-sudo python3 app.py
-```
-
-### 3. Acessar a API
-
-Abra seu navegador e acesse o IP público da VM. Você deverá ver a mensagem:
-> Olá, Mundo! Minha API está no ar!
-
-`http://<IP_PUBLICO_DA_VM>`
+6.  **Limpeza (Destruir a Infraestrutura)**
+    Para evitar custos, destrua todos os recursos criados com um único comando:
+    ```bash
+    terraform destroy
+    ```
 
 ---
 
-## 🧹 Limpeza
+## 3. Como Funciona a Infraestrutura
 
-Para **destruir todos os recursos** criados no Azure e evitar custos desnecessários, execute o seguinte comando no seu terminal local (na raiz do projeto):
+A infraestrutura deste projeto é totalmente descrita como código no arquivo `main.tf` e gerenciada pelo Terraform. Ao executar `terraform apply`, os seguintes recursos são criados e configurados no Azure:
 
-```bash
-terraform destroy
-```
-Confirme a operação digitando `yes` quando solicitado.
+* **Grupo de Recursos (`azurerm_resource_group`):** Um contêiner lógico para agrupar todos os recursos do projeto, facilitando o gerenciamento e a limpeza.
+* **Rede Virtual e Sub-rede (`azurerm_virtual_network`, `azurerm_subnet`):** Criam uma rede privada isolada na nuvem para a nossa máquina virtual, garantindo um ambiente seguro.
+* **IP Público (`azurerm_public_ip`):** Aloca um endereço de IP estático e público na internet para que possamos acessar nossa API e a VM via SSH.
+* **Grupo de Segurança de Rede (`azurerm_network_security_group`):** Atua como um firewall virtual para a VM. Ele está configurado com regras de entrada (`inbound`) para permitir tráfego nas seguintes portas:
+    * **Porta 22 (TCP):** Para permitir conexões SSH.
+    * **Porta 80 (TCP):** Para permitir tráfego HTTP para nossa API.
+* **Interface de Rede (`azurerm_network_interface`):** Conecta a máquina virtual à sub-rede, ao IP público e ao grupo de segurança.
+* **Máquina Virtual (`azurerm_linux_virtual_machine`):** O servidor Linux (Ubuntu) onde nossa aplicação Python/Flask é executada.
+
+---
+
+## 4. Como Funciona o CI/CD
+
+O pipeline de Integração Contínua (CI) é orquestrado pelo **GitHub Actions** e está definido no arquivo `.github/workflows/terraform.yml`.
+
+### Gatilho (Trigger)
+O fluxo de trabalho é acionado automaticamente a cada `push` de código para a branch `main` do repositório.
+
+### Processo de Validação
+Quando acionado, o pipeline executa os seguintes passos em um ambiente virtual (`ubuntu-latest`) fornecido pelo GitHub:
+
+1.  **Autenticação Segura:** O workflow se autentica na Azure de forma não-interativa usando um **Service Principal**. As credenciais (`Client ID`, `Client Secret`, `Tenant ID`, etc.) estão armazenadas de forma segura como **GitHub Secrets**, e não diretamente no código.
+
+2.  **Checkout do Código:** O código do repositório é baixado para o ambiente virtual.
+
+3.  **Setup do Terraform:** A versão especificada do Terraform é instalada.
+
+4.  **Terraform Init:** O comando `terraform init` é executado para inicializar o Terraform e baixar os providers necessários.
+
+5.  **Terraform Plan:** O comando `terraform plan` é executado. Este é o passo de validação mais importante. Ele verifica a sintaxe do código e gera um plano de execução, confirmando que a infraestrutura descrita é válida e pode ser aplicada.
+
+O objetivo deste pipeline de CI não é aplicar as mudanças (`terraform apply`), mas sim **garantir que o código de infraestrutura na branch principal esteja sempre em um estado válido e planejável**, prevenindo erros antes que cheguem a um ambiente de produção.
