@@ -1,0 +1,7 @@
+# Arquivos de estado e lock do Terraform
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Pasta de plugins do Terraform
+.terraform/
