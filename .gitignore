@@ -1,0 +1,10 @@
+# Arquivos de ambiente
+.env
+
+# Cache e arquivos compilados do Python
+__pycache__/
+*.pyc
+
+# Diretórios de ferramentas de virtualização
+.venv/
+venv/
