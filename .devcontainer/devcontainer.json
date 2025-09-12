@@ -1,0 +1,50 @@
+{
+    "name": "Projeto Final IA - Ambiente DevOps",
+    // 1. Imagem Base do Container de Desenvolvimento
+    // Usamos uma imagem universal da Microsoft que já vem com muitas ferramentas úteis (Python, Docker, Git, etc.)
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+
+    // 2. Features: Adiciona ferramentas extras ao ambiente
+    "features": {
+        // Adiciona a ferramenta de linha de comando do Terraform
+        "ghcr.io/devcontainers/features/terraform:1": {
+            "version": "latest"
+        }
+    },
+
+    // 3. Configurações do VS Code
+    "customizations": {
+        "vscode": {
+            // Lista de extensões do VS Code a serem instaladas automaticamente
+            "extensions": [
+                "ms-python.python",
+                "ms-azuretools.vscode-docker",
+                "hashicorp.terraform",
+                "ms-vscode-remote.remote-containers"
+            ]
+        }
+    },
+    
+    // 4. Ações a serem tomadas após a criação do ambiente
+    // Instala as dependências do Python automaticamente
+    "postCreateCommand": "pip install -r requirements.txt",
+
+    // 5. Encaminhamento de Portas
+    // Diz ao Codespaces para expor a porta do Streamlit e abrir um navegador
+    "forwardPorts": [8501],
+    "portsAttributes": {
+        "8501": {
+            "label": "Streamlit App",
+            "onAutoForward": "openPreview"
+        }
+    },
+
+    // 6. Variáveis de Ambiente (Secrets)
+    // Instrui o desenvolvedor sobre os secrets necessários
+    "secrets": {
+        "GEMINI_API_KEY": {
+            "description": "Chave da API do Google Gemini para o agente funcionar.",
+            "documentationUrl": "https://aistudio.google.com/app/apikey"
+        }
+    }
+}
